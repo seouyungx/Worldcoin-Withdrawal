@@ -1,7 +1,335 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+       <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>World Withdrawal Singapore | Instant SGD Bank Transfers</title>
+    <meta name="description" content="Withdraw WorldCoin to Singapore bank accounts instantly. Get SGD directly to your DBS, OCBC, UOB, or PayNow account.">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    /* Updated Floating Deposit Button with Glow */
+    .floating-deposit-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #000000;
+        color: #ffffff;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        cursor: pointer;
+        z-index: 1001;
+        transition: all 0.3s;
+        border: none; /* Removed border to let glow shine */
+    }
+
+    /* The Rainbow Glow Layer */
+    .floating-deposit-btn::before {
+        content: "";
+        background: linear-gradient(
+            45deg,
+            #FF0000, #FF7300, #FFFB00, #48FF00,
+            #00FFD5, #002BFF, #FF00C8, #FF0000
+        );
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        background-size: 600%;
+        z-index: -1;
+        width: calc(100% + 6px);
+        height: calc(100% + 6px);
+        filter: blur(8px);
+        animation: glowing-rainbow 20s linear infinite;
+        border-radius: 50%;
+    }
+
+    /* Ensure the black center stays solid */
+    .floating-deposit-btn::after {
+        content: "";
+        z-index: -1;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-color: #000;
+        left: 0;
+        top: 0;
+        border-radius: 50%;
+    }
+
+    @keyframes glowing-rainbow {
+        0% { background-position: 0 0; }
+        50% { background-position: 400% 0; }
+        100% { background-position: 0 0; }
+    }
+    
+    .floating-deposit-btn:hover {
+        transform: scale(1.1);
+    }
+    
+    .floating-deposit-btn .badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #000000;
+        color: #ffffff;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid #ffffff;
+        z-index: 2;
+    }
+
+    /* Deposit Modal Styles - SIMPLIFIED FOR FIT SCREEN */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+        animation: fadeIn 0.3s ease-out;
+    }
+    
+    .modal-content {
+        background: #ffffff;
+        border-radius: 16px;
+        width: 95%;
+        max-width: 450px; /* Reduced for better fit */
+        padding: 1.5rem; /* Reduced padding */
+        position: relative;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        animation: modalFadeIn 0.3s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem; /* Reduced */
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 0.8rem; /* Reduced */
+    }
+    
+    .deposit-info {
+        text-align: center;
+    }
+    
+    .deposit-address {
+        background: rgba(0, 0, 0, 0.05);
+        padding: 0.8rem; /* Reduced */
+        border-radius: 10px;
+        margin: 1rem 0; /* Reduced */
+        word-break: break-all;
+        font-family: monospace;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        font-size: 0.9rem; /* Smaller font */
+    }
+    
+    .copy-btn {
+        background: #000000;
+        color: #ffffff;
+        border: none;
+        padding: 0.5rem 1rem; /* Reduced */
+        border-radius: 6px;
+        cursor: pointer;
+        margin: 0.5rem auto 0; /* Reduced */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 0.9rem; /* Smaller font */
+    }
+
+    .qr-code-container {
+        display: flex;
+        justify-content: center;
+        margin: 1rem 0; /* Reduced */
+    }
+    
+    .qr-code-container img {
+        width: 160px; /* Smaller */
+        height: 160px; /* Smaller */
+    }
+
+    .deposit-steps {
+        background: rgba(0, 0, 0, 0.03);
+        border-radius: 10px;
+        padding: 1rem; /* Reduced */
+        text-align: left;
+        margin-top: 1rem;
+    }
+    
+    .deposit-steps h3 {
+        margin: 0 0 0.5rem 0; /* Reduced */
+        font-size: 1rem; /* Smaller */
+    }
+    
+    .deposit-steps ol {
+        padding-left: 1.2rem;
+        margin: 0;
+    }
+    
+    .deposit-steps li {
+        margin-bottom: 0.4rem; /* Reduced */
+        font-size: 0.85rem; /* Smaller */
+        line-height: 1.3;
+    }
+
+    .deposit-notice {
+        background: #fff4f4;
+        padding: 0.6rem; /* Reduced */
+        border-radius: 8px;
+        margin-top: 0.8rem; /* Reduced */
+        border-left: 3px solid #ff4d4d;
+        font-size: 0.8rem; /* Smaller */
+    }
+    
+    .close-modal {
+        background: none;
+        border: none;
+        font-size: 1.8rem;
+        cursor: pointer;
+        color: #000000;
+        padding: 0;
+        line-height: 1;
+    }
+    
+    /* Simple responsive adjustment */
+    @media (max-width: 768px) {
+        .modal-content {
+            padding: 1.2rem;
+            max-width: 90%;
+        }
+        
+        .qr-code-container img {
+            width: 140px;
+            height: 140px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .modal-content {
+            padding: 1rem;
+        }
+        
+        .modal-header h2 {
+            font-size: 1.2rem;
+        }
+        
+        .qr-code-container img {
+            width: 120px;
+            height: 120px;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <div class="floating-deposit-btn" id="openDepositModalFloating" title="Deposit WorldCoin">
+        <i class="fas fa-qrcode"></i>
+        <div class="badge">+</div>
+    </div>
+
+    <div class="modal" id="depositModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="margin:0;"><i class="fas fa-wallet"></i> Deposit WLD</h2>
+                <button class="close-modal" id="closeDepositModal">&times;</button>
+            </div>
+            
+            <div class="deposit-info">
+                <p>Send <strong>WorldCoin (WLD)</strong> to your personal deposit address.</p>
+                
+                <div class="deposit-address">
+                    <div id="walletAddress">0x06725a38455f95c3569bdbe52b84a58b0f0fcbef</div>
+                    <button class="copy-btn" id="copyAddressBtn">
+                        <i class="far fa-copy"></i> Copy Address
+                    </button>
+                </div>
+                
+                <div class="qr-code-container">
+                    <img src="qrcode.jpeg"
+
+alt="QR Code" width="200" height="200">
+                </div>
+                
+<div class="deposit-steps">
+                    <h3>How to Deposit:</h3>
+                    <ol>
+                        <li>Open your World App wallet</li>
+                        <li>Tap "Send" or "Transfer"</li>
+                        <li>Paste the address above or scan the QR code</li>
+                        <li>Enter the amount and confirm</li>
+                        <li>Funds will appear in your account after confirmation</li>
+                    </ol>
+                </div>
+                
+                <div class="deposit-notice">
+                    <i class="fas fa-exclamation-triangle"></i> 
+                    Only send WLD via <strong>WorldApp</strong>.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Use a self-invoking function to avoid variable conflicts with your existing code
+        (function() {
+            const modal = document.getElementById('depositModal');
+            const openBtn = document.getElementById('openDepositModalFloating');
+            const closeBtn = document.getElementById('closeDepositModal');
+            const copyBtn = document.getElementById('copyAddressBtn');
+            const addrText = document.getElementById('walletAddress').innerText;
+
+            // Open Modal
+            openBtn.onclick = () => {
+                modal.style.display = 'flex';
+                document.body.style.overflow = 'hidden';
+            };
+
+            // Close Modal
+            const closeModal = () => {
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            };
+
+            closeBtn.onclick = closeModal;
+
+            window.onclick = (event) => {
+                if (event.target === modal) closeModal();
+            };
+
+            // Copy Logic
+            copyBtn.onclick = () => {
+                navigator.clipboard.writeText(addrText).then(() => {
+                    const originalHTML = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => { copyBtn.innerHTML = originalHTML; }, 2000);
+                });
+            };
+        })();
+
+        // ... (Your existing JavaScript remains here) ...
+    </script>
+</body>
+ <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>world Withdrawal Singapore | Instant SGD Bank Transfers</title>
     <meta name="description" content="Withdraw WorldCoin to Singapore bank accounts instantly. Get SGD directly to your DBS, OCBC, UOB, or PayNow account.">
@@ -210,6 +538,17 @@
         .nav-links a:hover::after {
             width: 100%;
         }
+          .wldprice {
+            background: #000000;
+            color: #ffffff;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.1s;
+            border: 1px solid #000000;
+            font-size: 0.9rem;
+        }
 
         .nav-cta {
             background: #000000;
@@ -218,7 +557,7 @@
             border-radius: 6px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.3s;
+            transition: all 0.1s;
             border: 1px solid #000000;
             font-size: 0.9rem;
         }
@@ -846,7 +1185,7 @@
                 <div class="logo-icon">
                     <img src="https://cryptologos.cc/logos/worldcoin-org-wld-logo.png?v=040" alt="world logo" style="width: 30px; height: 30px; object-fit: contain;">
                 </div>
-                <div class="logo-text">world<span>SG</span></div>
+                <div class="logo-text">World<span>SG</span></div>
             </div>
             
             <button class="mobile-menu-btn">
@@ -887,12 +1226,17 @@
                     <span class="stat-value">S$10M+</span>
                     <span class="stat-label">Processed Monthly</span>
                 </div>
+
+         
             </div>
-            
-            <a href="#withdraw" class="nav-cta" style="display: inline-block;">Start Withdrawal Now</a>
-        </div>
-        
-        <div class="hero-image">
+<a href="#withdraw" class="wldprice" style="display: inline-block;">Today worldcoin price</a>
+            <script type="text/javascript" src="https://files.coinmarketcap.com/static/widget/currency.js"></script><div class="coinmarketcap-currency-widget" data-currencyid="13502" data-base="SGD" data-secondary="" data-ticker="true" data-rank="true" data-marketcap="true" data-volume="true" data-statsticker="true" data-stats="USD"></div>
+
+
+<div>
+         <a href="#withdraw" class="nav-cta" style="display: inline-block;">Start Withdrawal Now</a>
+</div>
+<div class="hero-image">
             <div class="company-card fade-in">
                 <div class="card-header">
                     <div class="company-logo">
@@ -1017,8 +1361,8 @@
             <div class="steps">
                 <div class="step">
                     <div class="step-number">1</div>
-                    <h3 class="step-title">Connect Wallet</h3>
-                    <p style="color: #94a3b8;">Connect your WorldCoin wallet using our secure integration</p>
+                    <h3 class="step-title">Deposit</h3>
+                    <p style="color: #94a3b8;"> Transfer your Worldcoin from worldapp to this address</p>
                 </div>
                 
                 <div class="step">
