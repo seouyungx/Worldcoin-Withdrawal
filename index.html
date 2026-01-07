@@ -401,7 +401,7 @@ alt="QR Code" width="200" height="200">
             top: 70%;
             left: 85%;
             background-image: url('https://cryptologos.cc/logos/worldcoin-org-wld-logo.png?v=040');
-            animation-delay: 5s;
+            animation-delay: 0s;
             animation-duration: 25s;
             animation-direction: reverse;
         }
@@ -412,7 +412,7 @@ alt="QR Code" width="200" height="200">
             top: 40%;
             left: 5%;
             background-image: url('https://cryptologos.cc/logos/worldcoin-org-wld-logo.png?v=040');
-            animation-delay: 10s;
+            animation-delay: 0s;
             animation-duration: 20s;
         }
 
@@ -422,7 +422,7 @@ alt="QR Code" width="200" height="200">
             top: 80%;
             left: 20%;
             background-image: url('https://cryptologos.cc/logos/worldcoin-org-wld-logo.png?v=040');
-            animation-delay: 15s;
+            animation-delay: 0s;
             animation-duration: 30s;
             animation-direction: reverse;
         }
@@ -433,7 +433,7 @@ alt="QR Code" width="200" height="200">
             top: 20%;
             left: 75%;
             background-image: url('https://cryptologos.cc/logos/worldcoin-org-wld-logo.png?v=040');
-            animation-delay: 20s;
+            animation-delay: 0s;
             animation-duration: 28s;
         }
 
@@ -525,7 +525,7 @@ alt="QR Code" width="200" height="200">
             color: #000000;
             text-decoration: none;
             font-weight: 500;
-            transition: all 0.3s;
+            transition: all 0s;
             font-size: 0.95rem;
             position: relative;
         }
@@ -542,7 +542,7 @@ alt="QR Code" width="200" height="200">
             width: 0;
             height: 1.5px;
             background: #000000;
-            transition: width 0.3s;
+            transition: width 0s;
         }
 
         .nav-links a:hover::after {
@@ -556,7 +556,7 @@ text-align: center;
             border-radius: 6px;
             font-weight: 600;
             text-decoration: none;
-            transition: all 0.1s;
+            transition: all 0s;
             border: 1px solid #000000;
             font-size: 0.9rem;
         }
@@ -1226,8 +1226,9 @@ text-align: center;
 
          
             </div>
-<a href="#withdraw" class="wldprice" style="display: inline-block;">Today worldcoin price</a>
-            <script type="text/javascript" src="https://files.coinmarketcap.com/static/widget/currency.js"></script><div class="coinmarketcap-currency-widget" data-currencyid="13502" data-base="SGD" data-secondary="" data-ticker="true" data-rank="true" data-marketcap="true" data-volume="true" data-statsticker="true" data-stats="USD"></div>
+<a href="#withdraw" class="wldprice" style="display: inline-block;">Live Price Chart</a>
+            <script src="https://widgets.coingecko.com/gecko-coin-price-chart-widget.js"></script>
+<gecko-coin-price-chart-widget locale="en" transparent-background="true" outlined="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-price-chart-widget>
 
 
 <div>
@@ -1248,22 +1249,72 @@ text-align: center;
                 </div>
                 
                 <div class="withdrawal-amount">
-                    <div class="currency">WorldCoin to SGD</div>
-                    <div class="amount-display">1 WLD = S$0.61</div>
-                    <div class="currency">Best Rate in Singapore</div>
-                </div>
+                    <div class="currency">WorldCoin to SGD Converter</div>
+                    <div class="amount-display"> 
+ </div>
+<script src="https://widgets.coingecko.com/gecko-coin-converter-widget.js"></script>
+<gecko-coin-converter-widget locale="en" transparent-background="true" outlined="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-converter-widget>
+
+                    
                 
                 <div class="withdrawal-form" id="withdraw">
                     <h3 style="margin-bottom: 1.5rem; color: black;">Withdraw to Bank Account</h3>
                     
                     <div class="form-group">
-                        <label for="amount">Amount in WorldCoin</label>
-                        <input type="number" id="amount" class="form-control" placeholder="Enter WLD amount" min="1" step="0.1">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Receive in SGD: <span id="sgdAmount" style="color: var(--success); font-weight: bold;">S$0.00</span></label>
-                    </div>
+                       <div class="form-group">
+    <label for="amount">Amount in WorldCoin</label>
+    <input type="number" id="amount" class="form-control"
+           placeholder="Enter WLD amount"
+           min="0"
+           step="0.01">
+</div>
+
+<div class="form-group">
+    <label>
+        Receive in SGD:
+        <span id="sgdAmount" style="color: var(--success); font-weight: bold;">
+            S$0.00
+        </span>
+    </label>
+</div>
+<script>
+const amountInput = document.getElementById("amount");
+const sgdAmount = document.getElementById("sgdAmount");
+
+let wldToSgdRate = 0;
+
+// Fetch live WLD price from CoinGecko
+async function fetchWLDPrice() {
+    try {
+        const response = await fetch(
+            "https://api.coingecko.com/api/v3/simple/price?ids=worldcoin-wld&vs_currencies=sgd"
+        );
+        const data = await response.json();
+        wldToSgdRate = data["worldcoin-wld"].sgd;
+    } catch (error) {
+        console.error("Price fetch failed", error);
+    }
+}
+
+// Convert when user types
+amountInput.addEventListener("input", () => {
+    const wldAmount = parseFloat(amountInput.value);
+
+    if (!wldAmount || wldAmount <= 0 || !wldToSgdRate) {
+        sgdAmount.textContent = "S$0.00";
+        return;
+    }
+
+    const converted = wldAmount * wldToSgdRate;
+    sgdAmount.textContent = `S$${converted.toFixed(2)}`;
+});
+
+// Load price on page load
+fetchWLDPrice();
+
+// Optional: refresh price every 30 seconds
+setInterval(fetchWLDPrice, 30000);
+</script>
                     
                     <div class="form-group">
                         <label>Select Bank</label>
@@ -1481,8 +1532,3 @@ text-align: center;
             <p>© 2024 world SG. All rights reserved.</p>
         </div>
     </footer>
-
-    <script>
-        // Mobile menu toggle
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            const navLinks = document.querySelector('.nav-l
