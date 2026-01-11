@@ -476,11 +476,22 @@ alt="QR Code" width="200" height="200">
             margin: 0 auto;
         }
 
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+       .logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;            /* Ensures the container spans the full width */
+    margin: 3px 0;         /* Adds some breathing room above/below */
+}
+
+.logo-text {
+
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000000;
+    font-family: 'inter', sans-serif; 
+}
 
         .logo-icon {
             width: 35px;
@@ -503,16 +514,6 @@ alt="QR Code" width="200" height="200">
 }
 
 
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #000000;
-        }
-
-        .logo-text span {
-            color: #000000;
         }
 
         .nav-links {
@@ -574,6 +575,23 @@ text-align: center;
         }
 
         .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            background: #333333;
+        }
+.converter {
+            background: #000000;
+            color: #ffffff;
+            padding: 0.7rem 1.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0;
+            border: 1px solid #000000;
+            font-size: 0.9rem;
+        }
+
+        .converter:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             background: #333333;
@@ -827,7 +845,7 @@ text-align: center;
 
         /* Features Section */
         .features {
-            padding: 60px 5%;
+            padding: 10px 5%;
             max-width: 1400px;
             margin: 0 auto;
             position: relative;
@@ -1001,8 +1019,8 @@ text-align: center;
         /* Footer */
         .footer {
             background: #ffffff;
-            padding: 50px 5% 25px;
-            margin-top: 60px;
+            padding: 20px 5% 25px;
+            margin-top: 10px;
             border-top: 1px solid rgba(0, 0, 0, 0.2);
             position: relative;
             z-index: 2;
@@ -1055,15 +1073,6 @@ text-align: center;
             opacity: 0.8;
         }
 
-        /* Mobile Menu */
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: #000000;
-            font-size: 1.3rem;
-            cursor: pointer;
-        }
 
         /* Responsive */
         @media (max-width: 1024px) {
@@ -1089,10 +1098,6 @@ text-align: center;
                 padding: 1.5rem;
                 box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
                 border-top: 1px solid rgba(0, 0, 0, 0.1);
-            }
-            
-            .mobile-menu-btn {
-                display: block;
             }
             
             .hero-content h1 {
@@ -1197,9 +1202,8 @@ text-align: center;
                 <div class="logo-icon">
                     <img src="https://cryptologos.cc/logos/worldcoin-org-wld-logo.png?v=040" alt="world logo" style="width: 30px; height: 30px; object-fit: contain;">
                 </div>
-                <div class="logo-text">World<span>SG</span></div>
-         
-    </header>
+                <div class="logo-text">World</div>
+         </header>
 
     <!-- Hero Section -->
     <section class="hero" id="home">
@@ -1223,13 +1227,97 @@ text-align: center;
                     <span class="stat-value">S$10M+</span>
                     <span class="stat-label">Processed Monthly</span>
                 </div>
+<div class="balance-container">
+        <div class="purse-circle">
+            <i class="fa-solid fa-wallet"></i>
+        </div>
+        
+        <div class="balance-info">
+            <span class="balance-title">Available Balance</span>
+            <div class="balance-value">$0</div>
+        </div>
+    </div>
+<style>
+/* The Balance Container */
+        .balance-container {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 30px;
+            box-shadow: 20px 20px 60px #bebebe, -20px -20px 60px #ffffff;
+            display: flex;
+            align-items: center;
+            min-width: 320px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
 
+        /* The Purse Icon Design */
+        .purse-circle {
+            background: linear-gradient(145deg, #6e8efb, #a777e3);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 20px;
+            box-shadow: 0 10px 20px rgba(110, 142, 251, 0.3);
+        }
+
+        .purse-circle i {
+            color: white;
+            font-size: 24px;
+        }
+
+        /* Text Content */
+        .balance-info {
+            flex-grow: 1;
+        }
+
+        .balance-title {
+            color: #8e8e93;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .balance-value {
+            color: #1c1c1e;
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        /* Subtle Glow Effect on the side */
+        .balance-container::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: -20px;
+            width: 100px;
+            height: 100px;
+            background: rgba(167, 119, 227, 0.1);
+            border-radius: 50%;
+        }
+
+        /* Small interactive animation */
+        .balance-container:active {
+            transform: scale(0.98);
+            box-shadow: inset 6px 6px 12px #bebebe, inset -6px -6px 12px #ffffff;
+        }
+    </style>
          
             </div>
 <a href="#withdraw" class="wldprice" style="display: inline-block;">Live Price Chart</a>
             <script src="https://widgets.coingecko.com/gecko-coin-price-chart-widget.js"></script>
 <gecko-coin-price-chart-widget locale="en" transparent-background="true" outlined="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-price-chart-widget>
 
+<div>
+ <a class="converter" style="display: inline-block;">Worldcoin to SGD Converter</a>
+<script src="https://widgets.coingecko.com/gecko-coin-converter-widget.js"></script>
+<gecko-coin-converter-widget locale="en" transparent-background="true" outlined="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-converter-widget>
 
 <div>
          <a href="#withdraw" class="nav-cta" style="display: inline-block;">Start Withdrawal Now</a>
@@ -1247,20 +1335,9 @@ text-align: center;
                         <i class="fas fa-shield-alt"></i> Secure
                     </div>
                 </div>
-                
-                <div class="withdrawal-amount">
-                    <div class="currency">WorldCoin to SGD Converter</div>
-                    <div class="amount-display"> 
- </div>
-<script src="https://widgets.coingecko.com/gecko-coin-converter-widget.js"></script>
-<gecko-coin-converter-widget locale="en" transparent-background="true" outlined="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-converter-widget>
-
-                    
-                
-                <div class="withdrawal-form" id="withdraw">
+<div class="withdrawal-form" id="withdraw">
                     <h3 style="margin-bottom: 1.5rem; color: black;">Withdraw to Bank Account</h3>
                     
-                    <div class="form-group">
                        <div class="form-group">
     <label for="amount">Amount in WorldCoin</label>
     <input type="number" id="amount" class="form-control"
@@ -1272,88 +1349,137 @@ text-align: center;
 <div class="form-group">
     <label>
         Receive in SGD:
-        <span id="sgdAmount" style="color: var(--success); font-weight: bold;">
-            S$0.00
-        </span>
+        <span id="sgdAmount" style="color: #28a745; font-weight: bold;">S$0.00</span>
     </label>
+</div>           
+                    <div class="form-group">
+    <label>Select Bank</label>
+    <div class="bank-options">
+        <div class="bank-option active" data-bank="dbs">
+            <div class="bank-icon"><img src="https://1000logos.net/wp-content/uploads/2021/05/DBS-Bank-logo.png" alt="DBS" style="width: 55px; height: 55px; object-fit: contain;"></div>
+            <div class="bank-name">DBS/POSB</div>
+        </div>
+        <div class="bank-option" data-bank="ocbc">
+            <div class="bank-icon"><img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC" style="width: 55px; height: 55px; object-fit: contain;"></div>
+            <div class="bank-name">OCBC</div>
+        </div>
+        <div class="bank-option" data-bank="uob">
+            <div class="bank-icon"><img src="https://1000logos.net/wp-content/uploads/2021/09/UOB-Logo.png" alt="UOB" style="width: 55px; height: 55px; object-fit: contain;"></div>
+            <div class="bank-name">UOB</div>
+        </div>
+        <div class="bank-option" data-bank="paynow">
+            <div class="bank-icon"><img src="https://brandlogos.net/wp-content/uploads/2025/05/paynow-logo_brandlogos.net_pvtn1-1536x299.png" alt="PayNow" style="width: 55px; height: 55px; object-fit: contain;"></div>
+            <div class="bank-name">PayNow</div>
+        </div>
+    </div>
 </div>
+
+<div class="form-group">
+    <label for="account" id="accountLabel">Bank Account Number</label>
+    <input type="text" id="account" class="form-control" placeholder="Enter account number">
+</div>
+
 <script>
-const amountInput = document.getElementById("amount");
-const sgdAmount = document.getElementById("sgdAmount");
+document.addEventListener("DOMContentLoaded", function () {
 
-let wldToSgdRate = 0;
+    /* ===============================
+       WLD → SGD CONVERTER
+    ================================ */
+    const amountInput = document.getElementById("amount");
+    const sgdAmount = document.getElementById("sgdAmount");
 
-// Fetch live WLD price from CoinGecko
-async function fetchWLDPrice() {
-    try {
-        const response = await fetch(
-            "https://api.coingecko.com/api/v3/simple/price?ids=worldcoin-wld&vs_currencies=sgd"
-        );
-        const data = await response.json();
-        wldToSgdRate = data["worldcoin-wld"].sgd;
-    } catch (error) {
-        console.error("Price fetch failed", error);
-    }
-}
+    let wldToSgdRate = 0;
 
-// Convert when user types
-amountInput.addEventListener("input", () => {
-    const wldAmount = parseFloat(amountInput.value);
-
-    if (!wldAmount || wldAmount <= 0 || !wldToSgdRate) {
-        sgdAmount.textContent = "S$0.00";
-        return;
+    async function fetchWLDPrice() {
+        try {
+            const response = await fetch(
+                "https://api.coingecko.com/api/v3/simple/price?ids=worldcoin-wld&vs_currencies=sgd"
+            );
+            const data = await response.json();
+            wldToSgdRate = data["worldcoin-wld"].sgd;
+        } catch (error) {
+            console.error("Price fetch failed", error);
+        }
     }
 
-    const converted = wldAmount * wldToSgdRate;
-    sgdAmount.textContent = `S$${converted.toFixed(2)}`;
+    amountInput.addEventListener("input", function () {
+        const wldAmount = parseFloat(this.value);
+
+        if (isNaN(wldAmount) || wldAmount <= 0 || !wldToSgdRate) {
+            sgdAmount.textContent = "S$0.00";
+            return;
+        }
+
+        const converted = wldAmount * wldToSgdRate;
+        sgdAmount.textContent = `S$${converted.toFixed(2)}`;
+    });
+
+    fetchWLDPrice();
+    setInterval(fetchWLDPrice, 30000);
+
+
+    /* ===============================
+       BANK SELECTION LOGIC
+    ================================ */
+    const accountInput = document.getElementById("account");
+    const accountLabel = document.getElementById("accountLabel");
+    const allBankOptions = document.querySelectorAll(".bank-option");
+
+    allBankOptions.forEach(option => {
+        option.addEventListener("click", function () {
+
+            allBankOptions.forEach(opt => opt.classList.remove("active"));
+            this.classList.add("active");
+
+            const bankType = this.dataset.bank;
+
+            if (bankType === "paynow") {
+                accountLabel.textContent = "Mobile Number";
+                accountInput.placeholder = "Enter mobile number";
+                accountInput.value = "+65 ";
+            } else {
+                accountLabel.textContent = "Bank Account Number";
+                accountInput.placeholder = "Enter account number";
+                accountInput.value = "";
+            }
+        });
+    });
+
 });
-
-// Load price on page load
-fetchWLDPrice();
-
-// Optional: refresh price every 30 seconds
-setInterval(fetchWLDPrice, 30000);
 </script>
-                    
-                    <div class="form-group">
-                        <label>Select Bank</label>
-                        <div class="bank-options">
-                            <div class="bank-option active" data-bank="dbs">
-                                <div class="bank-icon">                    <img src="https://1000logos.net/wp-content/uploads/2021/05/DBS-Bank-logo.png" alt="world logo" style="width: 55px; height: 55px; object-fit: contain;"></div>
-                                <div class="bank-name">DBS/POSB</div>
-                            </div>
-                            <div class="bank-option" data-bank="ocbc">
-                                <div class="bank-icon"><img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="world logo" style="width: 55px; height: 55px; object-fit: contain;"></div>
-                                <div class="bank-name">OCBC</div>
-                            </div>
-                            <div class="bank-option" data-bank="uob">
-                                <div class="bank-icon"><img src="https://1000logos.net/wp-content/uploads/2021/09/UOB-Logo.png" alt="world logo" style="width: 55px; height: 55px; object-fit: contain;"></div>
-                                <div class="bank-name">UOB</div>
-                            </div>
-                            <div class="bank-option" data-bank="paynow">
-                                <div class="bank-icon"><img src="https://brandlogos.net/wp-content/uploads/2025/05/paynow-logo_brandlogos.net_pvtn1-1536x299.png" alt="world logo" style="width: 55px; height: 55px; object-fit: contain;"></div>
-                                <div class="bank-name">PayNow</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="account">Bank Account Number</label>
-                        <input type="text" id="account" class="form-control" placeholder="Enter account number">
-                    </div>
-                    
                     <button class="withdraw-btn pulse" id="withdrawBtn">
                         <i class="fas fa-arrow-right"></i> Withdraw Now
                     </button>
                 </div>
-            </div>
-        </div>
+            <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const withdrawBtn = document.getElementById('withdrawBtn');
+    const amountInput = document.getElementById('amount');
+
+    withdrawBtn.addEventListener('click', function(e) {
+        // Prevent any default form submission
+        e.preventDefault();
+
+        // Get the value from the amount input
+        const amount = amountInput.value;
+
+        // Validation logic
+        if (!amount || parseFloat(amount) <= 0) {
+            // This is the warning notification you requested
+            alert("⚠️Insufficient Balance \nPlease deposit WLD coin from your World App to this wallet address before attempting a withdrawal.");
+        } else {
+            // Logic for what happens if they DO have an amount
+            // For example: opening a processing modal or showing a success message
+            alert("Processing your withdrawal of " + amount + " WLD...");
+        }
+    });
+});
+</script>
     </section>
 
     <!-- Features Section -->
     <section class="features" id="features">
-        <h2 class="section-title">Why Choose word SG?</h2>
+        <h2 class="section-title">Why Choose WorldSG?</h2>
         
         <div class="features-grid">
             <div class="feature-card">
@@ -1410,7 +1536,7 @@ setInterval(fetchWLDPrice, 30000);
                 <div class="step">
                     <div class="step-number">1</div>
                     <h3 class="step-title">Deposit</h3>
-                    <p style="color: #000000;"> Transfer your Worldcoin from worldapp to this address</p>
+                    <p style="color: #000000;"> Transfer your Worldcoin from world App to this Deposit address</p>
                 </div>
                 
                 <div class="step">
@@ -1478,8 +1604,7 @@ setInterval(fetchWLDPrice, 30000);
                         <h4>Michael Lee</h4>
                         <p>Content Creator</p>
                     </div>
-                </div>
-      
+                </div>      
     </section>
 
     <!-- Footer -->
@@ -1492,7 +1617,7 @@ setInterval(fetchWLDPrice, 30000);
                     Fast, secure, and reliable.
                 </p>
                 <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <a href="#" style="color: var(--company-blue);"><i class="fab fa-twitter"></i></a>
+                    <a href="https://x.com/worldcoin" style="color: var(--company-blue);"><i class="fab fa-twitter"></i></a>
                     <a href="#" style="color: var(--company-blue);"><i class="fab fa-whatsapp"></i></a>
                     <a href="#" style="color: var(--company-blue);"><i class="fab fa-instagram"></i></a>
                     <a href="#" style="color: var(--company-blue);"><i class="fab fa-tiktok"></i></a>
