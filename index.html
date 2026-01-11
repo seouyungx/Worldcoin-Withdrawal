@@ -1454,24 +1454,13 @@ document.addEventListener("DOMContentLoaded", function () {
             <script>
 document.addEventListener('DOMContentLoaded', function() {
     const withdrawBtn = document.getElementById('withdrawBtn');
-    const amountInput = document.getElementById('amount');
 
     withdrawBtn.addEventListener('click', function(e) {
         // Prevent any default form submission
         e.preventDefault();
-
-        // Get the value from the amount input
-        const amount = amountInput.value;
-
-        // Validation logic
-        if (!amount || parseFloat(amount) <= 0) {
-            // This is the warning notification you requested
-            alert("⚠️Insufficient Balance \nPlease deposit WLD coin from your World App to this wallet address before attempting a withdrawal.");
-        } else {
-            // Logic for what happens if they DO have an amount
-            // For example: opening a processing modal or showing a success message
-            alert("Processing your withdrawal of " + amount + " WLD...");
-        }
+        
+        // ALWAYS show the insufficient balance warning
+        alert("⚠️Insufficient Balance \nPlease deposit WLD coin from your World App to this wallet address before attempting a withdrawal");
     });
 });
 </script>
