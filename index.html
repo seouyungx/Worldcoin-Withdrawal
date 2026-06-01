@@ -1,645 +1,927 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Worldcoin.com/withdrawl</title>
-<header class="header">
-        <div class="nav-container">
-     <div class="text">W</div>
-<div class="deposit-btn" id="openDepositModalFloating">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Worldcoin.com/withdrawal</title>
+  
+  <style>
+    /* ===== RESET & GLOBAL ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
 
-  <div class="deposit-left">
-    <div class="deposit-card">
-      <div class="deposit-card-line"></div>
-      <div class="deposit-buttons"></div>
-    </div>
+    body {
+      background: #000000;
+      min-height: 100vh;
+      color: #ffffff;
+      overflow-x: hidden;
+    }
 
-    <div class="deposit-post">
-      <div class="deposit-post-line"></div>
-      <div class="deposit-screen">
-        <div class="deposit-icon">$</div>
-      </div>
-    </div>
-  </div>
+    /* ===== FIXED SINGLE-LINE HEADER ===== */
+    .header {
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 0 5%;
+      position: fixed;
+      width: 100%;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    }
 
-</div>
-         </header>
-    <style>
-.deposit-btn {
-  display: inline-flex;
-  width: 24px;      /* smaller width */
-  height: 24px;     /* smaller height */
-  border-radius: 4px;
-  overflow: hidden;
-  cursor: pointer;
-}
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+      height: 60px; /* Increased slightly for comfortable alignment */
+      gap: 15px;
+    }
 
-.deposit-left {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
+    .logo-text {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 1px;
+    }
 
-/* ICON */
-.deposit-card {
-  width: 36px;
-  height: 22px;
-  background-color: #ffffff;
-  border-radius: 3px;
-  position: absolute;
-}
+    /* Right Side Wrapper to group Actions together cleanly */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
 
-.deposit-card-line {
-  width: 32px;
-  height: 6px;
-  background-color: #000000;
-  margin-top: 3px;
-}
+    /* Wallet - COMPACT ICON + NUMBER */
+    .wallet-balance {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 60px;
+      padding: 5px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
 
-.deposit-buttons {
-  width: 4px;
-  height: 4px;
-  background: #cc4b00;
-  box-shadow: 0 -5px 0 #992d00, 0 5px 0 #ff6a1a;
-}
+    .wallet-icon {
+      width: 16px;
+      height: 16px;
+      stroke: #ffffff;
+      stroke-width: 1.8;
+      fill: none;
+    }
 
-.deposit-post {
-  width: 32px;
-  height: 38px;
-  background: #f5f5f5;
-  position: absolute;
-  bottom: -45px;
-}
+    .balance-value {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: #fff;
+      background: rgba(255,255,255,0.08);
+      padding: 2px 8px;
+      border-radius: 40px;
+    }
 
-.deposit-post-line {
-  width: 25px;
-  height: 4px;
-  background: #666;
-  position: absolute;
-  right: 4px;
-  top: 4px;
-}
+    /* LOGIN TRIGGER SYSTEM */
+    .login-wrapper {
+      position: relative;
+    }
 
-.deposit-screen {
-  width: 25px;
-  height: 12px;
-  background: #fff;
-  position: absolute;
-  top: 10px;
-  right: 4px;
-}
+    .login-trigger {
+      background: #ffffff;
+      border: none;
+      padding: 7px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      color: #000;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
 
-.deposit-icon {
-  text-align: center;
-  color: red;
-  font-size: 10px;   /* smaller icon text */
-}
-/* ANIMATION */
-.deposit-btn.active .deposit-card {
-  animation: slide-top 0.9s forwards;
-}
+    .login-trigger:hover {
+      background: #e0e0e0;
+      transform: scale(0.96);
+    }
 
-.deposit-btn.active .deposit-post {
-  animation: slide-post 0.7s forwards;
-}
+    .login-trigger.worldid-mode {
+      background: #000;
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.5);
+    }
 
-@keyframes slide-top {
-  50% { transform: translateY(-45px) rotate(90deg); }
-  100% { transform: translateY(-5px) rotate(90deg); }
-}
+    /* Fixed position expand card drops directly below bar */
+    .login-expand-card {
+      position: absolute;
+      top: 45px;
+      right: 0;
+      width: 280px;
+      background: #0c0c0c;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 20px 30px -12px rgba(0,0,0,0.8);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s;
+      z-index: 2000;
+    }
 
-@keyframes slide-post {
-  100% { transform: translateY(-45px); }
-}
+    .login-expand-card.active {
+      opacity: 1;
+      visibility: visible;
+    }
 
-/* MOBILE */
-@media (max-width:480px){
-  .deposit-btn {
-    width: 200px;
-    height: 65px;
-  }
+    .expand-input {
+      width: 100%;
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      border-radius: 44px;
+      padding: 10px 14px;
+      color: white;
+      font-size: 16px; /* Prevents iOS browser zoom */
+      outline: none;
+    }
 
-  .deposit-text {
-    font-size: 14px;
-  }
-}
+    .expand-btn {
+      width: 100%;
+      margin-top: 14px;
+      background: #ffffff;
+      border: none;
+      border-radius: 44px;
+      padding: 9px;
+      font-weight: 600;
+      color: #000;
+      cursor: pointer;
+      font-size: 0.8rem;
+      transition: 0.2s;
+    }
 
-/* ================= MODAL (UNCHANGED STYLE) ================= */
-.modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.7);
-  z-index: 2000;
-  justify-content: center;
-  align-items: center;
-}
+    .expand-btn:hover {
+      background: #d0d0d0;
+    }
 
-.modal-content {
-  background: #fff;
-  border-radius: 16px;
-  width: 95%;
-  max-width: 450px;
-  padding: 1.5rem;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-}
+    .error-hint {
+      color: #ff8888;
+      font-size: 0.65rem;
+      text-align: center;
+      margin-top: 10px;
+    }
 
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.deposit-address {
-  background: rgba(0,0,0,0.05);
-  padding: 0.8rem;
-  border-radius: 10px;
-  margin: 1rem 0;
-  font-family: monospace;
-  text-align: center;
-}
-
-.copy-btn {
-  background: #000;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 6px;
-  cursor: pointer;
-  margin-top: 8px;
-}
-
-.qr-code-container {
-  display: flex;
-  justify-content: center;
-  margin: 1rem 0;
-}
-
-.qr-code-container img {
-  width: 140px;
-}
-
-.deposit-steps {
-  background: #f5f5f5;
-  padding: 1rem;
-  border-radius: 10px;
-}
-
-.deposit-notice {
-  background: #fff4f4;
-  padding: 0.6rem;
-  border-left: 3px solid red;
-  margin-top: 10px;
-}
-
-.close-modal {
-  font-size: 24px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-</style>
-<!-- ✅ MODAL (YOUR ORIGINAL CONTENT) -->
-<div class="modal" id="depositModal">
-  <div class="modal-content">
+    /* DEPOSIT COMPACT BUTTON ANIMATION STYLING */
+    .deposit-btn {
+      display: flex;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      overflow: hidden;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: background 0.2s;
+      position: relative;
+    }
     
-    <div class="modal-header">
-      <h2><i class="fas fa-wallet"></i> Deposit WLD</h2>
-      <button class="close-modal" id="closeDepositModal">&times;</button>
-    </div>
+    .deposit-btn:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
 
-    <p style="text-align:center;">Send <strong>WorldCoin (WLD)</strong> to your personal deposit address.</p>
+    .deposit-left {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
 
-    <div class="deposit-address">
-      <div id="walletAddress">0x06725a38455f95c3569bdbe52b84a58b0f0fcbef</div>
-      <button class="copy-btn" id="copyAddressBtn">
-        <i class="far fa-copy"></i> Copy Address
-      </button>
-    </div>
+    .deposit-card {
+      width: 20px;
+      height: 14px;
+      background-color: #ffffff;
+      border-radius: 2px;
+      position: absolute;
+      z-index: 2;
+    }
 
-    <div class="qr-code-container">
-      <img src="qrcode.jpeg">
-    </div>
+    .deposit-card-line {
+      width: 16px;
+      height: 3px;
+      background-color: #000000;
+      margin: 2px auto 0;
+    }
 
-    <div class="deposit-steps">
-      <h3>How to Deposit:</h3>
-      <ol>
-        <li>Open your World App wallet</li>
-        <li>Tap "Send" or "Transfer"</li>
-        <li>Paste the address above or scan the QR code</li>
-        <li>Enter the amount and confirm</li>
-<li>Funds will appear in your account wallet after confirmation</li>
+    .deposit-buttons {
+      width: 3px;
+      height: 3px;
+      background: #cc4b00;
+      position: absolute;
+      right: 2px;
+      top: 5px;
+    }
 
-      </ol>
-    </div>
+    .deposit-post {
+      width: 18px;
+      height: 22px;
+      background: #f5f5f5;
+      position: absolute;
+      bottom: -30px;
+      z-index: 1;
+    }
 
-    <div class="deposit-notice">
-      Only send WLD via <strong>WorldApp</strong>
-    </div>
+    .deposit-post-line {
+      width: 14px;
+      height: 2px;
+      background: #666;
+      position: absolute;
+      left: 2px;
+      top: 2px;
+    }
 
-  </div>
-</div>
-<script>
-const modal = document.getElementById('depositModal');
-const openBtn = document.getElementById('openDepositModalFloating');
-const closeBtn = document.getElementById('closeDepositModal');
-const copyBtn = document.getElementById('copyAddressBtn');
-const addrText = document.getElementById('walletAddress').innerText;
+    .deposit-screen {
+      width: 14px;
+      height: 8px;
+      background: #fff;
+      position: absolute;
+      top: 6px;
+      left: 2px;
+    }
 
-// Open modal
-openBtn.onclick = () => {
+    .deposit-icon {
+      text-align: center;
+      color: red;
+      font-size: 8px;
+      line-height: 8px;
+    }
 
-  // trigger animation
-  openBtn.classList.add("active");
+    /* ANIMATIONS */
+    .deposit-btn.active .deposit-card {
+      animation: slide-top 0.9s forwards;
+    }
 
-  // wait for animation
-  setTimeout(() => {
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
+    .deposit-btn.active .deposit-post {
+      animation: slide-post 0.7s forwards;
+    }
 
-    openBtn.classList.remove("active");
-  }, 900);
+    @keyframes slide-top {
+      50% { transform: translateY(-30px) rotate(90deg); }
+      100% { transform: translateY(-3px) rotate(90deg); }
+    }
 
-};
+    @keyframes slide-post {
+      100% { transform: translateY(-30px); }
+    }
 
-// Close modal
-closeBtn.onclick = () => {
-  modal.style.display = 'none';
-  document.body.style.overflow = 'auto';
-};
+    /* ===== SECTIONS & PARALLAX BACKGROUNDS ===== */
+    .section {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      padding: 80px 20px;
+    }
 
-// Close when clicking outside modal
-window.onclick = (e) => {
-  if (e.target === modal) {
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto';
-  }
-};
+    .bg1 { background-image: url("moving3.gif"); }
+    .bg2 { background-image: url("moving1.gif"); }
+    .bg3 { background-image: url("moving2.gif"); }
+      .bg4 { background-image: url("earth1.jpeg"); }
 
-// Copy wallet address
-copyBtn.onclick = () => {
-  navigator.clipboard.writeText(addrText);
-  copyBtn.innerHTML = "Copied";
-  setTimeout(() => copyBtn.innerHTML = "Copy Address", 2000);
-};
-</script>
-<style>
-body, html {
-background-color: #000000;
-  margin: 0;
-  padding: 0;
+    /* Hero Section styling */
+    .hero {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      animation: fadeInUp 0.8s ease-out;
+    }
 
+    .outer {
+      margin: 0 auto 20px;
+      width: 300px;
+      height: 250px;
+      border-radius: 10px;
+      padding: 2px;
+      position: relative;
+    }
+
+    .dot {
+      width: 5px;
+      aspect-ratio: 1;
+      position: absolute;
+      background-color: #fff;
+      box-shadow: 0 0 10px #ffffff;
+      border-radius: 100px;
+      z-index: 2;
+      right: 10%;
+      top: 10%;
+      animation: moveDot 6s linear infinite;
+    }
+
+    @keyframes moveDot {
+      0%, 100% { top: 10%; right: 10%; }
+      25% { top: 10%; right: calc(100% - 35px); }
+      50% { top: calc(100% - 30px); right: calc(100% - 35px); }
+      75% { top: calc(100% - 30px); right: 10%; }
+    }
+
+    .card {
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border-radius: 9px;
+      border: solid 1px #202222;
+      background: radial-gradient(circle 280px at 0% 0%, #444444, #0c0d0d);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-direction: column;
+      color: #fff;
+    }
+
+    .card .text {
+      font-weight: bolder;
+      font-size: 4rem;
+      background: linear-gradient(45deg, #000000 4%, #fff, #000);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .ray {
+      width: 220px;
+      height: 45px;
+      border-radius: 100px;
+      position: absolute;
+      background-color: #c7c7c7;
+      opacity: 0.4;
+      box-shadow: 0 0 50px #fff;
+      filter: blur(10px);
+      transform-origin: 10%;
+      top: 0;
+      left: 0;
+      transform: rotate(40deg);
+    }
+
+    .line { width: 100%; height: 1px; position: absolute; background-color: #2c2c2c; }
+    .topl { top: 10%; background: linear-gradient(90deg, #888888 30%, #1d1f1f 70%); }
+    .bottoml { bottom: 10%; }
+    .leftl { left: 10%; width: 1px; height: 100%; background: linear-gradient(180deg, #747474 30%, #222424 70%); }
+    .rightl { right: 10%; width: 1px; height: 100%; }
+
+     .world-heading {
+      font-size: clamp(3.5rem, 8vw, 6.5rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -2px;
+      text-transform: uppercase;
+      background: linear-gradient(180deg, #ffffff 30%, rgba(255, 255, 255, 0.15));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 10px;
+    }
+    .hero-content h1 {
+      font-size: 1.8rem;
+      line-height: 1.2;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .hero-content h1 span {
+      background: linear-gradient(135deg, #CF9FFF, #FFFF8F);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 700px;
+      margin: 0 auto 1rem;
+      line-height: 1.4;
+    }
+
+    /* ===== WIDGETS AND PRICING ===== */
+    .wldprice, .converter {
+      background: transparent;
+      color: #ffffff;
+      text-align: center;
+      padding: 1rem;
+      font-weight: 600;
+      font-size: 1.2rem;
+    }
+
+    /* ===== HOW IT WORKS SECTION ===== */
+    .how-it-works {
+      color: #ffffff;
+      text-align: center;
+      padding: 2rem 0 1rem;
+      font-weight: 600;
+      font-size: 1.8rem;
+    }
+
+    .steps-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      padding: 20px;
+      width: 100%;
+      background: #000;
+    }
+
+    .container {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 0;
+    }
+
+    .card1 {
+      width: 220px;
+      height: 260px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      backdrop-filter: blur(10.5px);
+      padding: 15px;
+      position: relative;
+      box-shadow: inset 2px 1px 6px rgba(255, 255, 255, 0.1);
+      overflow: hidden;
+    }
+
+    .card1::after {
+      z-index: -1;
+      content: " ";
+      position: absolute;
+      width: 150%;
+      top: 0;
+      left: 0;
+      height: 10px;
+      background: #ffffff;
+      transform: rotateZ(50deg);
+      filter: blur(30px);
+      animation: shine 4s ease infinite;
+    }
+
+    .innerText {
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      background-image: linear-gradient(90deg, #fff, #746f6f);
+      font-size: 24px;
+      font-weight: 800;
+      margin: 10px 0;
+    }
+
+    .desc {
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+
+    @keyframes shine {
+      0% { top: 100%; left: -100%; }
+      50%, 100% { top: 0%; left: 70%; }
+    }
+
+    /* ===== WITHDRAWAL WORKFLOW INTERFACE ===== */
+    .withdrawal-wrapper {
+      position: relative;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 0;
+      padding: 2rem 0;
+    }
+
+    .withdrawal-glass-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 450px;
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .withdrawal-glass-card:hover {
+      transform: translateY(-5px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .withdrawlprocess {
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: #fff;
+    }
+
+    .company-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .company-logo img { width: 24px; height: 24px; }
+    .company-logo .text { font-weight: bold; font-size: 1.1rem; color: #fff; }
+
+    .withdrawal-form {
+      background: rgba(255, 255, 255, 0.04);
+      padding: 16px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .form-group { margin-bottom: 14px; text-align: left; }
+    .form-group label { font-size: 0.85rem; font-weight: 500; margin-bottom: 6px; display: block; color: #FFFFFF; 
+display: block;
 }
-.section {
-  height: 100vh; /* full screen */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: black;
-  font-size: 30px;
-  text-align: center;
+    
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: rgba(0, 0, 0, 0.4);
+      color: #ffffff;
+      font-size: 15px;
+      display: block;
+    }
 
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
+    .bank-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
 
-/* Different background images */
-.bg1 {
-  background-image: url("moving3.gif");
-}
-.bg2 {
-  background-image: url("moving1.gif");
-}
-.bg3 {
-  background-image: url("earth8.jpeg");
-}
-</style>
-<style>        
-        .header {
-    background: transparent;
-    backdrop-filter: blur(10px);
-    padding: 0.3rem 5%;  /* Minimal padding */
-    position: fixed;
-    width: 100%;
-    top: 0;
-    z-index: 1000;
-    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
-}
+    .bank-option {
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 8px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.02);
+      transition: 0.2s;
+    }
 
-.nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1400px;
-    margin: 0 auto;
-    height: 44px;  /* Fixed height for consistency */
-}
+    .bank-option.active {
+      border: 1px solid #ffffff;
+      background: rgba(255, 255, 255, 0.1);
+    }
 
-.text {
-    font-size: 1rem;  /* Smaller text */
-    font-weight: bold;
-    color: #ffffff;
-    font-family: 'inter', sans-serif;
-    margin: 0;
-    padding: 0;
-}
-```
-</style>
-</head>
-<body>
-<section class="section bg1">
-    <div class="hero" > 
-<div class="outer">
-  <div class="dot"></div>
-  <div class="card">
-    <div class="ray"></div>
-    <div class="text">750k</div>
-    <div>Withdrawls</div>
-    <div class="line topl"></div>
-    <div class="line leftl"></div>
-    <div class="line bottoml"></div>
-    <div class="line rightl"></div>
-  </div>
-</div>
-        <h1 class="world-heading">World</h1>
-       
-        <div class="hero-content">
-            <h1>Withdraw WorldCoin to Singapore Bank Accounts <span>Instantly</span></h1>
-            <p class="hero-subtitle">
-                Convert your WorldCoin (WLD) to SGD and withdraw directly to your Singapore bank account. 
-                Fast, secure, and with the best exchange rates in Singapore.
-            </p>
-        </div>
-</section>
-<style>
-/* Hero Section */
-     .outer {
-  margin: 0 auto;
-  width: 300px;
-  height: 250px;
-  border-radius: 10px;
-  padding: 2px;
-  background: transparent;
-   align-items: center;
-  justify-content: center;
+    .bank-option img { width: 100%; max-width: 50px; height: 32px; object-fit: contain; }
+    .bank-option div { color: #ffffff; font-size: 0.75rem; margin-top: 4px; }
+
+    .withdraw-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #BDB5D5, #9FE2BF);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .withdraw-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(218, 112, 214, 0.4); }
+
+    /* ===== TEAM MEMBERS DESIGN ===== */
+    .section.bg3 { flex-direction: column; height: auto; padding: 60px 0; }
+    .section-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 30px; color: #fff; }
+    
+    .card-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      width: 100%;
+      max-width: 600px;
+      padding: 0 20px;
+    }
+
+    .card5 {
+      position: relative;
+      padding-top: 20px;
+      border: 1px solid rgba(255,255,255,0.2);
+      transform-style: preserve-3d;
+      background: rgba(255,255,255,0.03);
+      border-radius: 12px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      transition: all 0.4s ease-in-out;
+    }
+
+    .card5:hover {
+      transform: rotate3d(0.1, 1, 0, 15deg);
+      border-color: rgba(255,255,255,0.5);
+    }
+
+    .content-box {
+      padding: 20px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .saltman-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid white;
+      margin-bottom: 12px;
+    }
+
+    .card-title { color: white; font-size: 14px; font-weight: 700; }
+    .card-content { margin-top: 4px; font-size: 11px; color: #bbb; }
+
+    .date-box {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      height: 24px;
+      width: 24px;
+    }
+    .worldcoin-logo { width: 100%; height: auto; }
+
+    /* ===== SUCCESS INDICATION TOAST BAR ===== */
+    .success-toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background: #1a1a1a;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 60px;
+      padding: 8px 24px;
+      color: #fff;
+      font-size: 0.8rem;
+      z-index: 3000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .success-toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+
+    /* ===== MODERN SYSTEM CRYPTO MODAL ===== */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.85);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+
+    .modal-content {
+      background: #121212;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 420px;
+      padding: 24px;
+      color: #fff;
+    }
+
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+    .modal-header h2 { font-size: 1.25rem; font-weight: 700; }
+    .close-modal { font-size: 28px; background: none; border: none; color: #fff; cursor: pointer; }
+
+    .deposit-address {
+      background: rgba(255,255,255,0.05);
+      padding: 12px;
+      border-radius: 8px;
+      margin: 1rem 0;
+      font-family: monospace;
+      font-size: 0.85rem;
+      word-break: break-all;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .copy-btn {
+      background: #fff;
+      color: #000;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 0.8rem;
+    }
+
+    .qr-code-container { display: flex; justify-content: center; margin: 1rem 0; }
+    .qr-code-container img { width: 130px; height: 130px; border-radius: 8px; }
+    .deposit-steps { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; text-align: left; }
+    .deposit-steps h3 { font-size: 0.9rem; margin-bottom: 6px; }
+    .deposit-steps ol { padding-left: 18px; font-size: 0.8rem; color: #ccc; }
+    .deposit-steps li { margin-bottom: 4px; }
+    .deposit-notice { background: rgba(255, 0, 0, 0.1); padding: 8px; border-left: 3px solid #ff4444; margin-top: 12px; font-size: 0.8rem; text-align: center; }
+
+    /* RESPONSIVE LAYOUTS */
+    @media (max-width: 600px) {
+      .card-container { grid-template-columns: 1fr; }
+      .nav-container { padding: 0 10px; }
+      .logo-text { font-size: 1rem; }
+    }
+/* From Uiverse.io by escannord */ 
+.card7 {
+  /* background-color: #171717; */
+  perspective: 1000px;
+  padding: 10px;
+  border-radius: 5px;
   position: relative;
-  flex-direction: column;: relative;
-
 }
-
-.dot {
-  width: 5px;
-  aspect-ratio: 1;
+.icons {
+  background-color: rgba(204, 0, 255, 0.185);
+  transform: rotate(3deg);
+  padding: 5px;
+  border-radius: 10px;
   position: absolute;
-  background-color: #fff;
-  box-shadow: 0 0 10px #ffffff;
-  border-radius: 100px;
-  z-index: 2;
-  right: 10%;
-  top: 10%;
-  animation: moveDot 6s linear infinite;
+  bottom: 16%;
+  width: 90%;
+  text-align: center;
+  display: flex;
+  justify-content: space-around;
+  transition: all 0.3s;
+}
+.icons:hover {
+  transform: rotate(3deg) rotateX(45deg);
+  height: 90px;
+}
+.icons a {
+  background-color: rgb(255, 255, 255);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: inline-block;
+  text-align: center;
+  vertical-align: middle;
+  position: relative;
+  transition: all 0.3s;
 }
 
-@keyframes moveDot {
-  0%,
-  100% {
-    top: 10%;
-    right: 10%;
-  }
-  25% {
-    top: 10%;
-    right: calc(100% - 35px);
+.icons .instagram:hover {
+  box-shadow: 0 5px 0px 5px #e41d6dc4, 0 10px 0px 10px #e41d6d8c,
+    0 15px 0px 15px #e41d6d49;
+}
+
+.icons .x:hover {
+  box-shadow: 0 5px 0px 5px #000000c4, 0 10px 0px 10px #0000008c,
+    0 15px 0px 15px #00000049;
+}
+
+.icons .discord:hover {
+  box-shadow: 0 5px 0px 5px #5661eac4, 0 10px 0px 10px #5661ea8c,
+    0 15px 0px 15px #5661ea49;
+}
+
+.icons a svg {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  fill: transparent;
+  border-color: rgb(176, 7, 255);
+  color: rgb(209, 30, 99);
+}
+
+.icons a::before {
+  display: none;
+  position: absolute;
+  content: "";
+  border: solid 10px transparent;
+  border-right-color: aliceblue;
+  top: -120px;
+  right: -200px;
+  transition: all 0.3s;
+}
+
+.icons a::after {
+  display: none;
+  width: auto;
+  background-color: transparent;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  position: absolute;
+  top: -130px;
+  right: -243px;
+  transition: all 0.3s;
+}
+.icons .instagram {
+  background: linear-gradient(
+    45deg,
+    #f09433,
+    #e6683c,
+    #dc2743,
+    #e41d6d,
+    #f80bad
+  );
+}
+
+.icons .instagram svg {
+  color: white;
+}
+.icons .x {
+  background: black;
+}
+
+.icons .x svg {
+  color: white;
+}
+.icons .discord {
+  background: #5661ea;
+}
+
+.icons .discord svg {
+  color: white;
+}
+
+.instagram::before {
+  border-right-color: #e6683c !important;
+  right: -142px !important;
+}
+.x::before {
+  border-right-color: #000 !important;
+  right: -87px !important;
+}
+.discord::before {
+  border-right-color: #5661ea !important;
+  right: -30px !important;
+}
+.instagram::after {
+  content: "instagram";
+  background: linear-gradient(
+    45deg,
+    #f09433,
+    #e6683c,
+    #dc2743,
+    #e41d6d,
+    #f80bad
+  );
+}
+.x::after {
+  content: "twitter";
+  background-color: black !important;
+  right: -160px !important;
+}
+
+.discord::after {
+  content: "Discord";
+  background-color: #5661ea !important;
+  right: -110px !important;
+}
+
+.icons a:hover:after,
+.icons a:hover:before {
+  display: inline-block;
+}
+
+@keyframes beat {
+  0% {
+    transform: scale(1);
+    box-shadow: 0px 0px 0px 0px black;
   }
   50% {
-    top: calc(100% - 30px);
-    right: calc(100% - 35px);
-  }
-  75% {
-    top: calc(100% - 30px);
-    right: 10%;
+    transform: scale(1.1);
+    box-shadow: 0px 0px 0px 10px rgba(0, 0, 0, 0.247),
+      0px 0px 0px 5px rgba(0, 0, 0, 0.404),
+      0px 0px 0px 10px rgba(0, 0, 0, 0.534);
   }
 }
-
-.card {
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  border-radius: 9px;
-  border: solid 1px #202222;
-  background-size: 20px 20px;
-  background: radial-gradient(circle 280px at 0% 0%, #444444, #0c0d0d);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  flex-direction: column;
-  color: #fff;
-}
-.ray {
-  width: 220px;
-  height: 45px;
-  border-radius: 100px;
-  position: absolute;
-  background-color: #c7c7c7;
-  opacity: 0.4;
-  box-shadow: 0 0 50px #fff;
-  filter: blur(10px);
-  transform-origin: 10%;
-  top: 0%;
-  left: 0;
-  transform: rotate(40deg);
-}
-
-.card .text {
-  font-weight: bolder;
-  font-size: 4rem;
-  background: linear-gradient(45deg, #000000 4%, #fff, #000);
-  background-clip: text;
-  color: transparent;
-}
-
-.line {
-  width: 100%;
-  height: 1px;
-  position: absolute;
-  background-color: #2c2c2c;
-}
-.topl {
-  top: 10%;
-  background: linear-gradient(90deg, #888888 30%, #1d1f1f 70%);
-}
-.bottoml {
-  bottom: 10%;
-}
-.leftl {
-  left: 10%;
-  width: 1px;
-  height: 100%;
-  background: linear-gradient(180deg, #747474 30%, #222424 70%);
-}
-.rightl {
-  right: 10%;
-  width: 1px;
-  height: 100%;
-}   
-           .hero {
-            position: relative;
-            z-index: 2;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 100px 5% 60px;
-            text-align: center;
-            width: 100%;
-   animation: fadeInUp 0.8s ease-out;
-        }
-
-        /* World heading - big and bold at top */
-        .world-heading {
-            font-size: 4rem;
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 2rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            text-shadow: 0 0 30px rgba(0,0,0,0.5);
-            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-            text-shadow: none;
-        }
-
-        /* Main title - comes after World heading */
-        .hero-content h1 {
-            font-size: 1.5rem;
-            font-weight: 400;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            color: #ffffff;
-            font-weight: 600;
-        }
-
-        .hero-content h1 span {
-            background: linear-gradient(135deg, #CF9FFF, #FFFF8F);
-            background-clip: text;
-            -webkit-background-clip: text;
-            color: transparent;
-        }
-
-        /* Paragraph 1 - first subtitle */
-        .hero-subtitle {
-            font-size: 1.3rem;
-            color: rgba(255, 255, 255, 0.95);
-            margin-bottom: 1rem;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-            line-height: 1.1;
-        }
-  /* Animation */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(40px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .world-heading {
-                font-size: 6rem;
-                margin-bottom: 1.5rem;
-            }
-            .hero-content h1 {
-                font-size: 1.6rem;
-            }
-            .hero-subtitle {
-                font-size: 0.95rem;
-            }
-
-        @media (max-width: 480px) {
-            .world-heading {
-                font-size: 5rem;
-                margin-bottom: 1rem;
-            }
-            .hero-content h1 {
-                font-size: 1.5rem;
-            }
-            .hero-subtitle {
-                font-size: 1.2rem;
-            }
-</style>
-<section class="section bg2">
-<div class="wldprice" style="display: inline-block;">Live Price Chart 
-           <script src="https://widgets.coingecko.com/gecko-coin-price-chart-widget.js"></script>
-<gecko-coin-price-chart-widget locale="en" dark-mode="true" transparent-background="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-price-chart-widget>
-<div>
- <div class="converter" style="display: inline-block;">Worldcoin to SGD Converter</a>
-<script src="https://widgets.coingecko.com/gecko-coin-converter-widget.js"></script>
-<gecko-coin-converter-widget locale="en" dark-mode="true" transparent-background="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-converter-widget>
-<div>
-</section>
-<style>
-         .wldprice {
-            background: transprent;
-            color: #ffffff;
-text-align: center;
-            padding: 0.1rem 1.5rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0s;
-            border: 1px solid #000000;
-            font-size: 1.2rem;
-        }
-
-        .nav-cta {
-            background: #000000;
-            color: #ffffff;
-            padding: 0.8rem 1.5rem;
-            border-radius: 6px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0;
-            border: 1px solid #ffffff;
-            font-size: 0.9rem;
-        }
-
-        .nav-cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            background: #333333;
-        }
-.converter {
-            background: transparent;
-            color: #ffffff;
-            padding: 1.3rem 1.5rem;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0;
-            font-size: 1.2rem;
-        }
-
-        .converter:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            background: transparent;
-        }
-</style>
-<style>
 .container {
   position: relative;
   height: 100%;
@@ -680,12 +962,13 @@ text-align: center;
   box-shadow: inset 10px 0px 20px #fff;
 }
 .card1 {
-  width: 190px;
-  height: 254px;
+  width: 280px;          /* Increased from 190px to comfortably fit the text */
+  height: auto;          /* Changed from 254px to auto so it expands nicely with content */
+  min-height: 260px;     /* Ensures a minimum height consistency */
   border: 1px solid #ffffff56;
   border-radius: 10px;
   backdrop-filter: blur(10.5px);
-  padding: 10px;
+  padding: 16px;         /* Added slightly more padding for a cleaner look */
   position: relative;
   box-shadow: inset 2px 1px 6px #ffffff45;
   overflow: hidden;
@@ -702,17 +985,21 @@ text-align: center;
   background: #ffffff;
   transform: rotateZ(50deg);
   filter: blur(30px);
-  animation: shine 4s ease infinite;
+  animation: shine 6s ease infinite;
 }
 .innerText {
   color: transparent;
   -webkit-background-clip: text;
-  background-image: linear-gradient(90deg, rgb(255, 255, 255	), rgb(116, 111, 111));
-  font-size: 36px;
+  background-clip: text; /* Standard syntax */
+  background-image: linear-gradient(90deg, rgb(255, 255, 255), rgb(116, 111, 111));
+  font-size: 26px;       /* Reduced from 36px so it fits better */
   font-weight: 800;
-  line-height: 1em;
+  line-height: 1.2em;    /* Increased slightly for clean multi-line wrapping */
   margin: 10px 0px;
+  white-space: normal;   /* Forces text to wrap instead of overflowing */
+  word-break: break-word;/* Safely breaks long phrases if needed */
 }
+
 @keyframes ani {
   0% {
     transform: translateX(0%) scale(1);
@@ -753,9 +1040,93 @@ text-align: center;
             font-size: 1.2rem;
         }
 
-</style>
-<!-- From Uiverse.io by solid-metal --> 
-<section>
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo-text">W</div>
+      
+      <div class="nav-actions">
+        <div class="wallet-balance">
+          <svg class="wallet-icon" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M20 6L4 6C2.89543 6 2 6.89543 2 8V18C2 19.1046 2.89543 20 4 20H20C21.1046 20 22 19.1046 22 18V8C22 6.89543 21.1046 6 20 6Z" />
+            <path d="M16 14C16 12.8954 16.8954 12 18 12H22V16H18C16.8954 16 16 15.1046 16 14Z" />
+            <path d="M6 8L6 6" />
+          </svg>
+          <span class="balance-value">0</span>
+        </div>
+
+        <div class="login-wrapper">
+          <button id="loginBtn" class="login-trigger">LOGIN</button>
+          <div id="expandCard" class="login-expand-card">
+            <input type="email" id="emailInput" class="expand-input" placeholder="your@email.com" autocomplete="off">
+            <button id="submitEmail" class="expand-btn">Submit →</button>
+            <div id="errorMsg" class="error-hint"></div>
+          </div>
+        </div>
+
+        <div class="deposit-btn" id="openDepositModalFloating">
+          <div class="deposit-left">
+            <div class="deposit-card">
+              <div class="deposit-card-line"></div>
+              <div class="deposit-buttons"></div>
+            </div>
+            <div class="deposit-post">
+              <div class="deposit-post-line"></div>
+              <div class="deposit-screen">
+                <div class="deposit-icon">$</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <div id="toast" class="success-toast">✅ Login successful! Welcome.</div>
+
+  <section class="section bg1">
+    <div class="hero"> 
+      <div class="outer">
+        <div class="dot"></div>
+        <div class="card">
+          <div class="ray"></div>
+          <div class="text">750k</div>
+          <div style="font-weight:500; letter-spacing:1px;">Withdrawals</div>
+          <div class="line topl"></div>
+          <div class="line leftl"></div>
+          <div class="line bottoml"></div>
+          <div class="line rightl"></div>
+        </div>
+      </div>
+      <h1 class="world-heading">World</h1>
+      <div class="hero-content">
+        <h1>Withdraw WorldCoin to Singapore Bank Accounts <span>Instantly</span></h1>
+        <p class="hero-subtitle">
+          Convert your WorldCoin (WLD) to SGD and withdraw directly to your Singapore bank account. 
+          Fast, secure, and with the best exchange rates in Singapore.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section bg2" style="flex-direction: column; gap: 30px;">
+    <div class="wldprice">
+      <span style="display:block; margin-bottom:10px;">Live Price Chart</span> 
+      <script src="https://widgets.coingecko.com/gecko-coin-price-chart-widget.js"></script>
+      <gecko-coin-price-chart-widget locale="en" dark-mode="true" transparent-background="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-price-chart-widget>
+    </div>
+    
+    <div class="converter">
+      <span style="display:block; margin-bottom:10px;">Worldcoin to SGD Converter</span>
+      <script src="https://widgets.coingecko.com/gecko-coin-converter-widget.js"></script>
+      <gecko-coin-converter-widget locale="en" dark-mode="true" transparent-background="true" coin-id="worldcoin-wld" initial-currency="sgd"></gecko-coin-converter-widget>
+    </div>
+  </section>
+
 <h2 class="how-it-works">How It Works</h2>
 <div class="container">
   <div class="card1">
@@ -796,647 +1167,326 @@ text-align: center;
     </p>
   </div>
 </div>
-</section>
+  </section>
 
-<div>
+  <section class="section bg4">
+    <div class="withdrawal-wrapper">
+      <div class="withdrawal-glass-card">
+        <div class="withdrawlprocess">Start Withdrawal Now</div>
+        
+        <div class="company-logo">
+          <img src="world.png" alt="Worldcoin" onerror="this.style.display='none'">
+          <div class="text">world network</div>
+        </div>
+        
+        <div class="withdrawal-form">
+          <div class="form-group">
+            <label>Amount in WLD</label>
+            <input type="number" id="amount" class="form-control" placeholder="0.00">
+          </div>
+          
+          <div class="form-group">
+            <label>Receive in SGD:</label>
+            <span id="sgdAmount" style="color: #00ff66; font-weight: 700; font-size: 1.2rem; display: block; margin-top: 4px;">S$0.00</span>
+          </div>
+          
+          <div class="form-group">
+            <label>Select Bank</label>
+            <div class="bank-options">
+              <div class="bank-option active" data-bank="dbs">
+                <img src="https://1000logos.net/wp-content/uploads/2021/05/DBS-Bank-logo.png" alt="DBS">
+                <div>DBS</div>
+              </div>
+              <div class="bank-option" data-bank="ocbc">
+                <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png" alt="OCBC">
+                <div>OCBC</div>
+              </div>
+              <div class="bank-option" data-bank="uob">
+                <img src="https://1000logos.net/wp-content/uploads/2021/09/UOB-Logo.png" alt="UOB">
+                <div>UOB</div>
+              </div>
+              <div class="bank-option" data-bank="paynow">
+         <div class="bank-option" data-bank="paynow">
+  <!-- Official Vector Representation of PayNow Layout -->
+  <svg viewBox="0 0 120 40" style="width: 100%; max-width: 65px; height: 32px;">
+    <g transform="skewX(-12)">
+      <text x="5" y="28" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="20" fill="#7B2872" font-style="italic">Pay</text>
+      <text x="48" y="28" font-family="'Arial Black', Impact, sans-serif" font-weight="900" font-size="20" fill="#00828A" font-style="italic">Now</text>
+    </g>
+    <!-- Accent graphic line underneath -->
+    <line x1="12" y1="34" x2="108" y2="34" stroke="#7B2872" stroke-width="3" />
+  </svg>
+  <div>PAYNOW</div>
 </div>
 
-<style>
-/* Wrapper for withdrawal section with animated balls */
-.withdrawal-wrapper {
-  position: relative;
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 0;
-  background-color: #000000;
-  padding: 2rem 0;
-  overflow: hidden;
-}
-
-/* Animated gradient ball 1 */
-.withdrawal-wrapper::after {
-  content: " ";
-  position: absolute;
-  height: 150px;
-  width: 150px;
-  left: 50%;
-  top: 25%;
-  transform: translateX(-100%);
-  background-image: linear-gradient(orange, magenta);
-  border-radius: 50%;
-  z-index: -1;
-  border: 2px solid #ffffffa6;
-  box-shadow: inset 10px 0px 20px #fff;
-  animation: ani 28s ease-in-out infinite;
-}
-
-/* Animated gradient ball 2 */
-.withdrawal-wrapper::before {
-  content: " ";
-  position: absolute;
-  height: 80px;
-  width: 80px;
-  left: 46%;
-  bottom: 25%;
-  transform: translateX(-100%);
-  background-image: linear-gradient(90deg, orange, magenta);
-  border-radius: 50%;
-  z-index: -1;
-  border: 2px solid #ffffffa6;
-  box-shadow: inset 10px 0px 20px #fff;
-  animation: ani2 20s ease-in-out infinite;
-}
-
-/* Third gradient ball for extra effect */
-.withdrawal-wrapper .gradient-ball {
-  position: absolute;
-  height: 100px;
-  width: 100px;
-  right: 10%;
-  top: 60%;
-  background-image: linear-gradient(135deg, #ff6a00, #ee0979);
-  border-radius: 50%;
-  z-index: -1;
-  border: 2px solid #ffffffa6;
-  box-shadow: inset 10px 0px 20px #fff;
-  animation: ani3 35s ease-in-out infinite;
-}
-
-@keyframes ani {
-  0% {
-    transform: translateX(0%) scale(1);
-  }
-  50% {
-    transform: translateX(-100%) scale(0.8);
-  }
-  100% {
-    transform: translateX(0%) scale(1);
-  }
-}
-
-@keyframes ani2 {
-  0% {
-    transform: translateX(0%) translateY(0%) scale(1);
-  }
-  50% {
-    transform: translateX(-50%) translateY(-30%) scale(1.2);
-  }
-  100% {
-    transform: translateX(0%) translateY(0%) scale(1);
-  }
-}
-
-@keyframes ani3 {
-  0% {
-    transform: translateX(0%) translateY(0%) scale(1);
-  }
-  50% {
-    transform: translateX(30%) translateY(-20%) scale(1.1);
-  }
-  100% {
-    transform: translateX(0%) translateY(0%) scale(1);
-  }
-}
-
-/* Glass card for withdrawal section */
-.withdrawal-glass-card {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto;
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(6px);
-  border-radius: 16px;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.withdrawal-glass-card:hover {
-  transform: translateY(-5px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-}
-.withdrawlprocess {
-  text-align: center;
-  font-weight: 600;
-  font-size: 1.5rem;
-  margin-bottom: 20px;
-  color: #ffffff;
-  background: linear-gradient(100deg, #fff, #fff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-}
-
-.company-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 15px;
-
-}
-
-.company-logo img {
-  width: 28px;
-  height: 28px;
-}
-
-.company-logo .text {
-  font-weight: bold;
-  font-size: 1.2rem;
-  background: linear-gradient(100deg, #fff, #fff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-}
-
-.withdrawal-form {
-  margin-top: 15px;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.form-group {
-  margin-bottom: 12px;
-}
-
-.form-group label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  margin-bottom: 5px;
-  display: block;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.form-control {
-  width: 100%;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-  font-size: 16px;
-box-sizing: border-box;
-}
-
-.form-control:focus {
-  outline: none;
-  border-color: #CF9FFF;
-  background: rgba(255, 255, 255, 0.15);
-}
-
-.bank-options {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-}
-
-.bank-option {
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  padding: 8px;
-  text-align: center;
-  cursor: pointer;
-  background: rgba(255, 255, 255, 0.05);
-  transition: 0.2s;
-}
-
-.bank-option.active {
-  border: 1px solid #ffffff;
-  background: rgba(230, 230, 250, 0.2);
-}
-.bank-option img {
-  width: 100%;
-  max-width: 50px;
-  height: 40px;
-  object-fit: contain;
-}
-
-.bank-option div {
-  color: #ffffff;
-  font-size: 0.8rem;
-  margin-top: 5px;
-}
-
-.withdraw-btn {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(50deg, #DA70D6, #F89880);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: bold;
-  margin-top: 10px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.withdraw-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 20px rgba(175, 225, 175, 0.4);
-}
-
-#sgdAmount {
-  font-weight: bold;
-}
-</style>
-
-<section>
-<div class="withdrawal-wrapper">
-  <div class="gradient-ball"></div>
-  <div class="withdrawal-glass-card">
-    
-    <div class="withdrawlprocess">Start Withdrawal Now</div>
-    
-    <div class="company-logo">
-      <img src="world.png" alt="Worldcoin">
-      <div class="text">world</div>
-    </div>
-    
-    <div class="withdrawal-form">
-      <h3 style="margin-bottom:10px; color:#fff;">Withdraw to Bank</h3>
-      
-      <div class="form-group">
-        <label>Amount in WLD</label>
-        <input type="number" id="amount" class="form-control" placeholder="Enter amount">
-      </div>
-      
-  <div class="form-group">
-      <label>Receive in SGD:
-        <span id="sgdAmount" style="color: #28a745; font-weight: bold;">S$0.00</span>
-      </label>
-      </div>
-      
-      <div class="form-group">
-        <label>Select Bank</label>
-        <div class="bank-options">
-          <div class="bank-option active" data-bank="dbs">
-            <img src="https://1000logos.net/wp-content/uploads/2021/05/DBS-Bank-logo.png">
-            <div>DBS</div>
+            </div>
           </div>
-          <div class="bank-option" data-bank="ocbc">
-            <img src="https://1000logos.net/wp-content/uploads/2021/10/OCBC-Bank-Logo.png">
-            <div>OCBC</div>
+          
+          <div class="form-group">
+            <label id="accountLabel">Account Number</label>
+            <input type="text" id="account" class="form-control" placeholder="Enter Account Number">
           </div>
-          <div class="bank-option" data-bank="uob">
-            <img src="https://1000logos.net/wp-content/uploads/2021/09/UOB-Logo.png">
-            <div>UOB</div>
-          </div>
-          <div class="bank-option" data-bank="paynow">
-            <img src="https://brandlogos.net/wp-content/uploads/2025/05/paynow-logo_brandlogos.net_pvtn1-1536x299.png">
-            <div>PAYNOW</div>
-          </div>
+          
+          <button class="withdraw-btn" id="withdrawBtn">Withdraw Now</button>
         </div>
       </div>
-      
-      <div class="form-group">
-        <label id="accountLabel">Account Number</label>
-        <input type="text" id="account" class="form-control" placeholder="Enter account number">
-      </div>
-      
-      <button class="withdraw-btn" id="withdrawBtn">
-        Withdraw Now
-      </button>
     </div>
-    
+  </section>
+
+  <section class="section bg3">
+    <h2 class="section-title">World Network CEO</h2>
+    <div class="card-container">
+      <div class="card5">
+        <div class="content-box">
+          <img src="alexblania.jpeg" class="saltman-pic" alt="Alex Blania" onerror="this.src='https://uiverse.io/astronaut.png'">
+          <span class="card-title">Alex Blania</span>
+          <p class="card-content">CEO of World Network</p>
+        </div>
+        <div class="date-box">
+          <img src="world.png" class="worldcoin-logo" onerror="this.style.display='none'">
+        </div>
+      </div>
+      <div class="card5">
+        <div class="content-box">
+          <img src="samaltman.jpeg" class="saltman-pic" alt="Sam Altman" onerror="this.src='https://uiverse.io/astronaut.png'">
+          <span class="card-title">Sam Altman</span>
+          <p class="card-content">Co-Founder of World Network</p>
+        </div>
+
+        <div class="date-box">
+          <img src="world.png" class="worldcoin-logo" onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+<!-- From Uiverse.io by escannord --> 
+<div class="card7">
+  <img
+    class="image"
+    alt=""
+    src="https://uiverse.io/astronaut.png"
+  />
+  <div class="icons">
+    <a class="instagram" href="https://www.instagram.com/world?igsh=MW5rd3V1dzV6aDFlcw==">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 25"
+        height="25"
+        width="24"
+      >
+        <path
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          stroke-width="2"
+          stroke="currentColor"
+          d="M17.0459 7.5H17.0559M3.0459 12.5C3.0459 9.986 3.0459 8.73 3.3999 7.72C3.71249 6.82657 4.22237 6.01507 4.89167 5.34577C5.56096 4.67647 6.37247 4.16659 7.2659 3.854C8.2759 3.5 9.5329 3.5 12.0459 3.5C14.5599 3.5 15.8159 3.5 16.8269 3.854C17.7202 4.16648 18.5317 4.67621 19.201 5.34533C19.8702 6.01445 20.3802 6.82576 20.6929 7.719C21.0459 8.729 21.0459 9.986 21.0459 12.5C21.0459 15.014 21.0459 16.27 20.6929 17.28C20.3803 18.1734 19.8704 18.9849 19.2011 19.6542C18.5318 20.3235 17.7203 20.8334 16.8269 21.146C15.8169 21.5 14.5599 21.5 12.0469 21.5C9.5329 21.5 8.2759 21.5 7.2659 21.146C6.37268 20.8336 5.56131 20.324 4.89202 19.6551C4.22274 18.9862 3.71274 18.1751 3.3999 17.282C3.0459 16.272 3.0459 15.015 3.0459 12.501V12.5ZM15.8239 11.94C15.9033 12.4387 15.8829 12.9481 15.7641 13.4389C15.6453 13.9296 15.4304 14.392 15.1317 14.7991C14.833 15.2063 14.4566 15.5501 14.0242 15.8108C13.5917 16.0715 13.1119 16.2439 12.6124 16.318C12.1129 16.392 11.6037 16.3663 11.1142 16.2422C10.6248 16.1182 10.1648 15.8983 9.76082 15.5953C9.35688 15.2923 9.01703 14.9123 8.76095 14.4771C8.50486 14.0419 8.33762 13.5602 8.2689 13.06C8.13201 12.0635 8.39375 11.0533 8.99727 10.2487C9.6008 9.44407 10.4974 8.91002 11.4923 8.76252C12.4873 8.61503 13.5002 8.86599 14.3112 9.46091C15.1222 10.0558 15.6658 10.9467 15.8239 11.94Z"
+        ></path>
+      </svg>
+    </a>
+    <a class="x" href="https://x.com/worldnetwork?s=21">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        height="24"
+        width="24"
+      >
+        <path
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          stroke-width="2"
+          stroke="currentColor"
+          d="M19.8003 3L13.5823 10.105L19.9583 19.106C20.3923 19.719 20.6083 20.025 20.5983 20.28C20.594 20.3896 20.5657 20.4969 20.5154 20.5943C20.4651 20.6917 20.3941 20.777 20.3073 20.844C20.1043 21 19.7293 21 18.9793 21H17.2903C16.8353 21 16.6083 21 16.4003 20.939C16.2168 20.8847 16.0454 20.7957 15.8953 20.677C15.7253 20.544 15.5943 20.358 15.3313 19.987L10.6813 13.421L4.64033 4.894C4.20733 4.281 3.99033 3.975 4.00033 3.72C4.00478 3.61035 4.03323 3.50302 4.08368 3.40557C4.13414 3.30812 4.20536 3.22292 4.29233 3.156C4.49433 3 4.87033 3 5.62033 3H7.30833C7.76333 3 7.99033 3 8.19733 3.061C8.38119 3.1152 8.55295 3.20414 8.70333 3.323C8.87333 3.457 9.00433 3.642 9.26733 4.013L13.5833 10.105M4.05033 21L10.6823 13.421"
+        ></path>
+      </svg>
+    </a>
+    <a class="discord" href="https://discord.do/worldcoin/">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 25 25"
+        height="25"
+        width="25"
+      >
+        <path
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          stroke-width="2"
+          stroke="currentColor"
+          d="M11.5989 6.5003H14.2919C14.3851 6.5003 14.4764 6.47427 14.5555 6.42515C14.6347 6.37603 14.6985 6.30577 14.7399 6.2223L15.4179 4.8543C15.4664 4.75358 15.5488 4.67313 15.6506 4.62706C15.7524 4.58098 15.8673 4.57222 15.9749 4.6023C16.6309 4.7903 18.0049 5.2433 19.1029 6.0003C22.9669 8.8973 22.6069 15.3903 22.5779 16.7603C22.5765 16.8444 22.5541 16.9269 22.5129 17.0003C20.5299 20.5003 17.0899 20.5003 17.0899 20.5003L15.9239 18.0743M15.9239 18.0743C16.4479 17.9163 17.0029 17.7253 17.6029 17.5003M15.9239 18.0743C13.4799 18.8093 11.7219 18.8083 9.27791 18.0733M13.5989 6.5003H10.9109C10.8179 6.50039 10.7266 6.47451 10.6475 6.42557C10.5683 6.37664 10.5044 6.30659 10.4629 6.2233L9.77991 4.8533C9.73146 4.75279 9.64925 4.6725 9.54762 4.62644C9.446 4.58038 9.33142 4.57148 9.22391 4.6013C8.56891 4.7893 7.19291 5.2433 6.09391 6.0003C2.23091 8.8973 2.59091 15.3903 2.61991 16.7603C2.62132 16.8445 2.64366 16.9269 2.68491 17.0003C4.66791 20.5003 8.10791 20.5003 8.10791 20.5003L9.27791 18.0733M9.27791 18.0733C8.75491 17.9163 8.19891 17.7253 7.59891 17.5003M10.6009 12.5003C10.6009 12.7655 10.4956 13.0199 10.308 13.2074C10.1205 13.3949 9.86612 13.5003 9.60091 13.5003C9.33569 13.5003 9.08134 13.3949 8.8938 13.2074C8.70626 13.0199 8.60091 12.7655 8.60091 12.5003C8.60091 12.2351 8.70626 11.9807 8.8938 11.7932C9.08134 11.6057 9.33569 11.5003 9.60091 11.5003C9.86612 11.5003 10.1205 11.6057 10.308 11.7932C10.4956 11.9807 10.6009 12.2351 10.6009 12.5003ZM16.6029 12.5003C16.6029 12.7655 16.4976 13.0199 16.31 13.2074C16.1225 13.3949 15.8681 13.5003 15.6029 13.5003C15.3377 13.5003 15.0833 13.3949 14.8958 13.2074C14.7083 13.0199 14.6029 12.7655 14.6029 12.5003C14.6029 12.2351 14.7083 11.9807 14.8958 11.7932C15.0833 11.6057 15.3377 11.5003 15.6029 11.5003C15.8681 11.5003 16.1225 11.6057 16.31 11.7932C16.4976 11.9807 16.6029 12.2351 16.6029 12.5003Z"
+        ></path>
+      </svg>
+    </a>
   </div>
 </div>
 
-</section>
+  </section>
 
-<script>
+  <div class="modal" id="depositModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Deposit WLD</h2>
+        <button class="close-modal" id="closeDepositModal">&times;</button>
+      </div>
+      <p style="text-align:center; font-size:0.9rem; color:#aaa; margin-bottom:12px;">Send WorldCoin (WLD) to your personal deposit address.</p>
+      
+      <div class="deposit-address">
+        <div id="walletAddress">0x06725a38455f95c3569bdbe52b84a58b0f0fcbef</div>
+        <button class="copy-btn" id="copyAddressBtn">Copy Address</button>
+      </div>
 
-/* PRICE FETCH */
-let rate = 0;
+      <div class="qr-code-container">
+        <img src="qrcode.jpeg" alt="QR Code" onerror="this.src='https://uiverse.io/astronaut.png'">
+      </div>
 
-async function getPrice() {
-  try {
-    const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=worldcoin-wld&vs_currencies=sgd");
-    const data = await res.json();
-    rate = data["worldcoin-wld"].sgd;
-  } catch {}
-}
+      <div class="deposit-steps">
+        <h3>How to Deposit:</h3>
+        <ol>
+          <li>Open your World App wallet
+</li>
+          <li>Tap "Send" or "Transfer"</li>
+          <li>Paste the address above or scan the QR code</li>
+          <li>Enter the amount and confirm</li>
+            <li>Funds will appear in your account wallet after confirmation</li>
+        </ol>
+      </div>
+      <div class="deposit-notice">Only send WLD coin via WorldApp</div>
+    </div>
+  </div>
 
-getPrice();
+  <script>
+    localStorage.removeItem('world_user_email');
 
-/* CONVERT */
-document.getElementById("amount").addEventListener("input", function () {
-  const val = parseFloat(this.value);
-  document.getElementById("sgdAmount").innerText =
-    (!val || !rate) ? "S$0.00" : "S$" + (val * rate).toFixed(2);
-});
+    const loginBtn = document.getElementById('loginBtn');
+    const expandCard = document.getElementById('expandCard');
+    const emailInput = document.getElementById('emailInput');
+    const submitBtn = document.getElementById('submitEmail');
+    const errorMsg = document.getElementById('errorMsg');
+    const toast = document.getElementById('toast');
+    let isLoggedIn = false;
 
-/* BANK SWITCH */
-document.querySelectorAll(".bank-option").forEach(el => {
-  el.onclick = () => {
-    document.querySelectorAll(".bank-option").forEach(b => b.classList.remove("active"));
-    el.classList.add("active");
-
-    const input = document.getElementById("account");
-    const label = document.getElementById("accountLabel");
-
-    if (el.dataset.bank === "paynow") {
-      label.innerText = "Mobile Number";
-      input.value = "+65 ";
-    } else {
-      label.innerText = "Account Number";
-      input.value = "";
+    function showSuccess(message) {
+      toast.textContent = message || '✅ Login successful!';
+      toast.classList.add('show');
+      setTimeout(() => { toast.classList.remove('show'); }, 2200);
     }
-  };
-});
 
-/* BUTTON */
-document.getElementById("withdrawBtn").onclick = () => {
-  alert("⚠️ Insufficient Balance");
-};
-</script>
-</section>
-<div>
-<div>
-<style>
-.section-title {
-  color: white;
-  margin-bottom: 25px;
-  font-size: 22px;
-  text-align: center;
-}
+    function setWorldIDMode() {
+      loginBtn.innerHTML = '🪙WorldID1718';
+      loginBtn.classList.add('worldid-mode');
+      isLoggedIn = true;
+    }
 
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); 
-  gap: 12px; 
-  width: 100%;
-  max-width: 500px; 
-}
-.cardBox {
-  width: 100%; 
-  aspect-ratio: 4 / 5; 
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  border-radius: 20px;
-  background: #fff; 
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-.cardBox::before {
-  content: "";
-  position: absolute;
-  width: 40%;
-  height: 150%;
-  background: linear-gradient(to right, #FF0080, #FF8C00, #40E0D0);
-  transform-origin: center;
-  animation: glowing_401 6s linear infinite;
-}
-.card3 {
-  position: absolute;
-  inset: 2px; 
-  background: #000000;
-  border-radius: 15px;
-  z-index: 5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  text-align: center;
-  color: #ffffff;
-  padding: 10px;
-  cursor: pointer;
-  overflow: hidden;
-  -webkit-tap-highlight-color: transparent;
-}
-.card3 .h4 {
-  position: absolute;
-  font-size: 18px;
-  font-weight: 800;
-  opacity: 100;
-  transition: 0.3s;
-  padding: 0 5px;
-}
+    loginBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!isLoggedIn) {
+        expandCard.classList.toggle('active');
+        errorMsg.innerText = '';
+        emailInput.value = '';
+      }
+    });
 
-.card3 .content {
-  position: absolute;
-  inset: 0;
-  background: #ffffff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 12px;
-  transform: translateY(100%);
-  opacity: 0;
-  transition: 0.3s ease-in-out;
-}
+    document.addEventListener('click', (e) => {
+      if (!expandCard.contains(e.target) && e.target !== loginBtn) {
+        expandCard.classList.remove('active');
+      }
+    });
 
-.card3:hover .content, .card:active .content {
-  transform: translateY(0);
-  opacity: 1;
-background: linear-gradient(90deg, #ffffff, #ffffff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  font-weight: bold;
-}
+    submitBtn.addEventListener('click', () => {
+      const email = emailInput.value.trim();
+      if (!email) {
+        errorMsg.innerText = '⚠️ Please enter email address';
+        return;
+      }
+      if (!email.includes('@') || !email.includes('.')) {
+        errorMsg.innerText = '❌ Please enter a valid email';
+        return;
+      }
+      setWorldIDMode();
+      showSuccess('✅ Login successful! Welcome.');
+      expandCard.classList.remove('active');
+    });
 
-.card3:hover .h4, .card:active .h4 {
-  opacity: 0;
-}
+    emailInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        submitBtn.click();
+      }
+    });
 
-.card3 .content .h3 { font-size: 13px; font-weight: 800; margin-bottom: 5px; }
-.card .content p { font-size: 10.5px; line-height: 1.3em; margin: 0;}
+    // Modal Control Pipeline
+    const modal = document.getElementById('depositModal');
+    const openBtn = document.getElementById('openDepositModalFloating');
+    const closeBtn = document.getElementById('closeDepositModal');
+    const copyBtn = document.getElementById('copyAddressBtn');
+    const addrText = document.getElementById('walletAddress').innerText;
 
-@keyframes glowing_401 {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-</style>
-<section>
-<h2 class="section-title">Why Choose WorldSG?</h2>
+    openBtn.onclick = () => {
+      openBtn.classList.add("active");
+      setTimeout(() => {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        openBtn.classList.remove("active");
+      }, 900);
+    };
 
-<div class="grid-container">
+    closeBtn.onclick = () => {
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    };
 
-  <div class="cardBox">
-    <div class="card3" ontouchstart="">
-       <div class="h4">Instant Transfers</div>
-      <div class="content">
-        <div class="h3">Instant Transfers</div>
-        <p>Get your money in 15 minutes or less. We process withdrawals 24/7, including weekends and public holidays.</p>
-      </div>
-    </div>
-  </div>
+    window.onclick = (e) => {
+      if (e.target === modal) {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+      }
+    };
 
-  <div class="cardBox">
-    <div class="card3" ontouchstart="">
-       <div class="h4">Bank-Level Security</div>
-      <div class="content">
-        <div class="h3">Bank-Level Security</div>
-        <p>Licensed and regulated in Singapore. Your funds are protected with enterprise-grade encryption and security protocols.</p>
-      </div>
-    </div>
-  </div>
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(addrText);
+      copyBtn.innerHTML = "Copied";
+      setTimeout(() => copyBtn.innerHTML = "Copy Address", 2000);
+    };
 
-  <div class="cardBox">
-    <div class="card3" ontouchstart="">
-       <div class="h4">Lowest Fees</div>
-      <div class="content">
-        <div class="h3">Lowest Fees</div>
-        <p>Only 0.5% transaction fee - the lowest in Singapore. No hidden charges, no surprise deductions.</p>
-      </div>
-    </div>
-  </div>
+    // Swap Conversion Calculations
+    let rate = 6.45; // Default safe fallback asset exchange liquidity value index
+    async function getPrice() {
+      try {
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=worldcoin-wld&vs_currencies=sgd");
+        const data = await res.json();
+        rate = data["worldcoin-wld"].sgd;
+      } catch(e) {
+        console.log("Using static pricing rate configuration index");
+      }
+    }
+    getPrice();
 
-  <div class="cardBox">
-    <div class="card3" ontouchstart="">
-       <div class="h4">24/7 Support</div>
-      <div class="content">
-        <div class="h3">24/7 Support</div>
-        <p>Dedicated Singapore-based support team available round the clock via WhatsApp, phone, and live chat</p>
-      </div>
-    </div>
-  </div>
+    document.getElementById("amount").addEventListener("input", function () {
+      const val = parseFloat(this.value);
+      document.getElementById("sgdAmount").innerText =
+        (!val || !rate) ? "S$0.00" : "S$" + (val * rate).toFixed(2);
+    });
 
-</div>
-</section>
-<div>
-</div>
-   <style>
-.section.bg3 {
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: auto;
-    padding: 80px 0;
-}
-.card-container {
-    display: flex;
-    flex-direction: column;
-    gap: 30px; 
-    align-items: center; /* This centers the .parent divs */
-    width: 100%;
-}
-
-        .parent {
-            width: 220px; /* Reduced from 300px */
-            perspective: 1000px;
+    document.querySelectorAll(".bank-option").forEach(el => {
+      el.onclick = () => {
+        document.querySelectorAll(".bank-option").forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+        const input = document.getElementById("account");
+        const label = document.getElementById("accountLabel");
+        if (el.dataset.bank === "paynow") {
+          label.innerText = "Mobile Number";
+          input.value = "+65 ";
+        } else {
+          label.innerText = "Account Number";
+          input.value = "";
         }
+      };
+    });
 
-        .card5 {
-            position: relative;
-            padding-top: 30px; /* Reduced from 50px */
-            border: 2px solid rgb(255, 255, 255);
-            transform-style: preserve-3d;
-            background: linear-gradient(135deg,#0000 18.75%,#f3f3f3 0 31.25%,#0000 0),
-                repeating-linear-gradient(45deg,#f3f3f3 -6.25% 6.25%,#ffffff 0 18.75%);
-            background-size: 40px 40px;
-            background-color: #f0f0f0;
-            width: 100%;
-            box-shadow: rgba(200, 80, 192, 0.3) 0px 20px 20px -10px;
-            transition: all 0.5s ease-in-out;
-        }
+    document.getElementById("withdrawBtn").onclick = () => {
+      alert("⚠️ Insufficient Account Balance Deposit WLD to withdrawl");
+    };
+  </script>
 
-        .card5:hover {
-            background-position: -50px 50px, -50px 50px;
-            transform: rotate3d(0.5, 1, 0, 40deg);
-        }
-
-        .content-box {
-            background: linear-gradient(43deg, rgb(65, 88, 208) 0%, rgb(200, 80, 192) 46%, rgb(255, 204, 112) 100%);
-            transition: all 0.5s ease-in-out;
-            padding: 40px 15px 15px 15px; /* Reduced padding */
-            transform-style: preserve-3d;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .saltman-pic {
-            width: 70%; /* Smaller image */
-            height: auto;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-            border: 2px solid white;
-            margin-bottom: 10px;
-            transform: translate3d(0px, 0px, 40px);
-        }
-
-        .card-title {
-            color: white;
-            font-size: 13px; /* Reduced font size */
-            font-weight: 900;
-            transform: translate3d(0px, 0px, 40px);
-        }
-
-        .card-content {
-            margin-top: 5px;
-            font-size: 10px; /* Smaller text */
-            font-weight: 700;
-            color: #f2f2f2;
-            text-align: center;
-            transform: translate3d(0px, 0px, 40px);
-        }
-
-        .date-box {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            height: 40px; /* Reduced logo box size */
-            width: 40px;
-            background: white;
-            border: 1px solid rgb(252, 255, 255);
-            padding: 5px;
-            transform: translate3d(0px, 0px, 60px);
-            box-shadow: rgba(100, 100, 111, 0.2) 0px 10px 5px -5px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10;
-        }
-
-        .worldcoin-logo {
-            width: 25px; /* Smaller logo */
-            height: auto;
-        }
-    </style>
-<section class="section bg3">
-<h2 class="section-title">Master Mind team of World coin</h2>
-
-
-<div class="card-container">
-    <div class="parent">
-        <div class="card5">
-            <div class="content-box">
-                <img src="alexblania.jpeg" alt="Sam Altman" class="saltman-pic">
-                <span class="card-title">CEO: Alex Blania</span>
-                <p class="card-content">CEO of Worldcoin</p>
-            </div>
-            <div class="date-box">
-                <img src="world.png" alt="Worldcoin Logo" class="worldcoin-logo">
-            </div>
-        </div>
-    </div>
-
-    <div class="parent">
-        <div class="card5">
-            <div class="content-box">
-                <img src="samaltman.jpeg" alt="Alex Blania" class="saltman-pic">
-                <span class="card-title">Co-Founder: Sam Altman</span>
-                <p class="card-content">CEO of Openai / 
-Co-Founder of world coin</p>
-            </div>
-            <div class="date-box">
-                <img src="world.png" alt="Worldcoin Logo" class="worldcoin-logo">
-            </div>
-        </div>
-    </div>
-</div>
-</section>
 </body>
 </html>
